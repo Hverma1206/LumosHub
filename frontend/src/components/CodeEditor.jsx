@@ -45,6 +45,8 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
 
     socketRef.current.on('connect', () => {
       setIsConnected(true);
+      
+      // Join the room
       socketRef.current.emit('join-room', {
         roomId,
         userName: userName || 'Anonymous'
@@ -55,7 +57,20 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
       setIsConnected(false);
     });
 
+    // Handle room not found
+    socketRef.current.on('room-not-found', ({ roomId }) => {
+      alert(`Room ${roomId} does not exist!`);
+      setIsConnected(false);
+    });
+
+    // Handle code updates from other users
     socketRef.current.on('code-update', (newCode) => {
+      isRemoteChange.current = true;
+      setCode(newCode);
+    });
+
+    // Handle remote edits
+    socketRef.current.on('remote-edit', (newCode) => {
       isRemoteChange.current = true;
       setCode(newCode);
     });
@@ -67,7 +82,17 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
       });
     });
 
-    // Add handler for users in room
+    // Handle user joined
+    socketRef.current.on('user-joined', ({ name }) => {
+      console.log(`${name} joined the room`);
+    });
+
+    // Handle user left
+    socketRef.current.on('user-left', ({ name }) => {
+      console.log(`${name} left the room`);
+    });
+
+    // Handle users update
     socketRef.current.on('users-update', (roomUsers) => {
       const updatedUsers = roomUsers.map(user => ({
         ...user,
@@ -78,7 +103,10 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
     });
 
     return () => {
-      socketRef.current?.disconnect();
+      if (socketRef.current) {
+        socketRef.current.emit('leave-room');
+        socketRef.current.disconnect();
+      }
     };
   }, [roomId, userName]);
 
@@ -90,9 +118,9 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
 
     setCode(value || '');
     
-    // Emit code changes to other users
+    // Emit code changes using local-edit
     if (socketRef.current && isConnected) {
-      socketRef.current.emit('code-change', {
+      socketRef.current.emit('local-edit', {
         roomId,
         code: value || ''
       });

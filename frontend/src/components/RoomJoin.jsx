@@ -1,21 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import io from 'socket.io-client'
 import './RoomJoin.css'
 
 const RoomJoin = ({ onJoinRoom }) => {
   const [roomId, setRoomId] = useState('')
   const [userName, setUserName] = useState('')
+  const [socket, setSocket] = useState(null)
 
-  const generateRoomId = () => {
-    return Math.random().toString(36).substring(2, 8).toUpperCase()
-  }
+  useEffect(() => {
+    const newSocket = io('http://localhost:8000')
+    setSocket(newSocket)
+
+    // Listen for room creation
+    newSocket.on('room-created', ({ roomId, userName }) => {
+      onJoinRoom(roomId, userName)
+    })
+
+    return () => {
+      newSocket.disconnect()
+    }
+  }, [onJoinRoom])
 
   const handleCreateRoom = () => {
     if (!userName.trim()) {
       alert('Please enter your name')
       return
     }
-    const newRoomId = generateRoomId()
-    onJoinRoom(newRoomId, userName.trim())
+    
+    if (socket) {
+      socket.emit('create-room', { userName: userName.trim() })
+    }
   }
 
   const handleJoinRoom = () => {
@@ -58,10 +72,9 @@ const RoomJoin = ({ onJoinRoom }) => {
               id="roomId"
               type="text"
               value={roomId}
-              onChange={(e) => setRoomId(e.target.value.toUpperCase())}
-              placeholder="Enter Room ID or leave blank to create new"
+              onChange={(e) => setRoomId(e.target.value)}
+              placeholder="Enter Room ID or create new"
               className="room-input"
-              maxLength={10}
             />
           </div>
           
@@ -71,7 +84,7 @@ const RoomJoin = ({ onJoinRoom }) => {
               className="create-button"
               disabled={!userName.trim()}
             >
-               Create a New Room
+              🚀 Create a New Room
             </button>
             
             <button
@@ -79,16 +92,14 @@ const RoomJoin = ({ onJoinRoom }) => {
               className="join-button"
               disabled={!userName.trim() || !roomId.trim()}
             >
-              Join Room
+              🚪 Join Room
             </button>
           </div>
         </div>
-
-       
       </div>
     </div>
   )
 }
 
 export default RoomJoin
-        
+
