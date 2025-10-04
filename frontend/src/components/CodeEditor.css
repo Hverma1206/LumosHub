@@ -1,5 +1,5 @@
 .code-editor {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
@@ -96,6 +96,14 @@
   color: #ff6b6b;
 }
 
+.user-count {
+  color: #cccccc;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
 .room-info {
   color: #cccccc;
   font-weight: 500;
@@ -105,20 +113,22 @@
   display: flex;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
 .editor-pane {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #3e3e42;
+  min-width: 0;
 }
 
 .output-pane {
-  width: 400px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   background: #1e1e1e;
+  border-left: 1px solid #3e3e42;
 }
 
 .pane-header {
@@ -148,14 +158,27 @@
   word-break: break-word;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
+  .output-pane {
+    width: 250px;
+  }
+  
+  .users-list {
+    width: 200px;
+  }
+}
+
+@media (max-width: 992px) {
   .editor-container {
     flex-direction: column;
   }
   
-  .output-pane {
+  .output-pane, 
+  .users-list {
     width: 100%;
-    height: 300px;
+    height: 250px;
+    border-left: none;
+    border-top: 1px solid #3e3e42;
   }
   
   .controls {
@@ -171,5 +194,22 @@
   
   .status {
     justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .output-pane,
+  .users-list {
+    height: 200px;
+  }
+  
+  .control-group {
+    width: 100%;
+  }
+  
+  .room-input,
+  .language-select,
+  .run-button {
+    width: 100%;
   }
 }

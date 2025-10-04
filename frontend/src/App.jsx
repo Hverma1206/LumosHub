@@ -20,7 +20,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🚀 LumosHub - Collaborative Code Editor</h1>
+        <h1>LumosHub </h1>
         {currentRoom && (
           <div className="room-header">
             <span className="room-info">Room: {currentRoom} | User: {userName}</span>

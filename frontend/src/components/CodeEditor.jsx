@@ -3,6 +3,7 @@ import MonacoEditor from '@monaco-editor/react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import './CodeEditor.css';
+import UsersList from './UsersList';
 
 const SUPPORTED_LANGUAGES = [
   { id: 'javascript', name: 'JavaScript', extension: 'js' },
@@ -32,6 +33,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
   const [roomId, setRoomId] = useState(propRoomId || 'default-room');
   const [isConnected, setIsConnected] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState(1);
+  const [users, setUsers] = useState([]);
   
   const socketRef = useRef(null);
   const editorRef = useRef(null);
@@ -39,11 +41,14 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
 
   useEffect(() => {
     // Initialize Socket.IO connection
-    socketRef.current = io('http://localhost:5000');
+    socketRef.current = io('http://localhost:8000');
 
     socketRef.current.on('connect', () => {
       setIsConnected(true);
-      socketRef.current.emit('join-room', roomId);
+      socketRef.current.emit('join-room', {
+        roomId,
+        userName: userName || 'Anonymous'
+      });
     });
 
     socketRef.current.on('disconnect', () => {
@@ -62,10 +67,20 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
       });
     });
 
+    // Add handler for users in room
+    socketRef.current.on('users-update', (roomUsers) => {
+      const updatedUsers = roomUsers.map(user => ({
+        ...user,
+        isYou: user.id === socketRef.current.id
+      }));
+      setUsers(updatedUsers);
+      setConnectedUsers(roomUsers.length);
+    });
+
     return () => {
       socketRef.current?.disconnect();
     };
-  }, [roomId]);
+  }, [roomId, userName]);
 
   const handleEditorChange = (value) => {
     if (isRemoteChange.current) {
@@ -100,7 +115,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
     setOutput('Running...');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/code/run', {
+      const response = await axios.post('http://localhost:8000/api/code/run', {
         language,
         code,
         version: '*'
@@ -184,8 +199,9 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
           <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
             {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
           </div>
-          <div className="room-info">Room: {roomId}</div>
-          {userName && <div className="user-info">User: {userName}</div>}
+          <div className="user-count">
+            👥 {connectedUsers} {connectedUsers === 1 ? 'user' : 'users'}
+          </div>
         </div>
       </div>
 
@@ -220,6 +236,8 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
           </div>
           <pre className="output-content">{output || 'Click "Run Code" to see output here...'}</pre>
         </div>
+
+        <UsersList users={users} />
       </div>
     </div>
   );
