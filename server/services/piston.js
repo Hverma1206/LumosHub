@@ -15,7 +15,6 @@ export const executeCode = async (language, version = "*", code) => {
     console.error("Execution error:", err);
     
     if (err.response?.data) {
-      // If the error response has data, stringify it properly
       const errorMessage = typeof err.response.data === 'object' 
         ? JSON.stringify(err.response.data)
         : err.response.data;

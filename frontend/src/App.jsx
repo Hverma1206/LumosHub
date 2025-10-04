@@ -1,34 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import CodeEditor from './components/CodeEditor'
+import RoomJoin from './components/RoomJoin'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentRoom, setCurrentRoom] = useState(null)
+  const [userName, setUserName] = useState('')
+
+  const handleJoinRoom = (roomId, name) => {
+    setCurrentRoom(roomId)
+    setUserName(name)
+  }
+
+  const handleLeaveRoom = () => {
+    setCurrentRoom(null)
+    setUserName('')
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      <header className="app-header">
+        <h1>🚀 LumosHub - Collaborative Code Editor</h1>
+        {currentRoom && (
+          <div className="room-header">
+            <span className="room-info">Room: {currentRoom} | User: {userName}</span>
+            <button onClick={handleLeaveRoom} className="leave-button">
+              Leave Room
+            </button>
+          </div>
+        )}
+      </header>
+      <main className="app-main">
+        {currentRoom ? (
+          <CodeEditor roomId={currentRoom} userName={userName} />
+        ) : (
+          <RoomJoin onJoinRoom={handleJoinRoom} />
+        )}
+      </main>
+    </div>
   )
 }
 
