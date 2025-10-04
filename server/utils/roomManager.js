@@ -1,18 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 
-// Global room storage: { roomId: { users: [{ id, name }], code: '' } }
 const rooms = new Map();
 
-/**
- * Generate a unique room ID
- */
 export const generateRoomId = () => {
   return uuidv4();
 };
 
-/**
- * Create a new room
- */
 export const createRoom = () => {
   const roomId = generateRoomId();
   rooms.set(roomId, {
@@ -22,9 +15,6 @@ export const createRoom = () => {
   return roomId;
 };
 
-/**
- * Create a room with a specific ID (for joining non-existent rooms)
- */
 export const createRoomWithId = (roomId) => {
   if (!rooms.has(roomId)) {
     rooms.set(roomId, {
@@ -35,23 +25,14 @@ export const createRoomWithId = (roomId) => {
   return roomId;
 };
 
-/**
- * Check if a room exists
- */
 export const roomExists = (roomId) => {
   return rooms.has(roomId);
 };
 
-/**
- * Get room data
- */
 export const getRoom = (roomId) => {
   return rooms.get(roomId);
 };
 
-/**
- * Add user to room
- */
 export const addUserToRoom = (roomId, socketId, userName) => {
   if (!rooms.has(roomId)) {
     return false;
@@ -62,9 +43,6 @@ export const addUserToRoom = (roomId, socketId, userName) => {
   return true;
 };
 
-/**
- * Remove user from room
- */
 export const removeUserFromRoom = (roomId, socketId) => {
   if (!rooms.has(roomId)) {
     return false;
@@ -76,7 +54,6 @@ export const removeUserFromRoom = (roomId, socketId) => {
   if (index !== -1) {
     room.users.splice(index, 1);
     
-    // Delete room if no users remain
     if (room.users.length === 0) {
       rooms.delete(roomId);
       return { deleted: true };
@@ -88,9 +65,6 @@ export const removeUserFromRoom = (roomId, socketId) => {
   return false;
 };
 
-/**
- * Update room code
- */
 export const updateRoomCode = (roomId, code) => {
   if (!rooms.has(roomId)) {
     return false;
@@ -101,17 +75,11 @@ export const updateRoomCode = (roomId, code) => {
   return true;
 };
 
-/**
- * Get all users in a room
- */
 export const getRoomUsers = (roomId) => {
   const room = rooms.get(roomId);
   return room ? room.users : [];
 };
 
-/**
- * Get room statistics
- */
 export const getRoomStats = () => {
   return {
     totalRooms: rooms.size,
@@ -121,3 +89,4 @@ export const getRoomStats = () => {
     }))
   };
 };
+ *
