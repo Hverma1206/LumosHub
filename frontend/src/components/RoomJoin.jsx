@@ -8,7 +8,7 @@ const RoomJoin = ({ onJoinRoom }) => {
   const [socket, setSocket] = useState(null)
 
   useEffect(() => {
-    const newSocket = io('http://localhost:8000')
+    const newSocket = io(import.meta.env.VITE_BACKEND_URL)
     setSocket(newSocket)
 
     // Listen for room creation

@@ -41,7 +41,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
 
   useEffect(() => {
     // Initialize Socket.IO connection
-    socketRef.current = io('http://localhost:8000');
+  socketRef.current = io(import.meta.env.VITE_BACKEND_URL);
 
     socketRef.current.on('connect', () => {
       setIsConnected(true);
@@ -143,7 +143,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
     setOutput('Running...');
 
     try {
-      const response = await axios.post('http://localhost:8000/api/code/run', {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/code/run`, {
         language,
         code,
         version: '*'
@@ -225,7 +225,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
 
         <div className="status">
           <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
-            {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
+            {isConnected ? ' Connected' : ' Disconnected'}
           </div>
           <div className="user-count">
             👥 {connectedUsers} {connectedUsers === 1 ? 'user' : 'users'}
@@ -236,7 +236,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
       <div className="editor-container">
         <div className="editor-pane">
           <div className="pane-header">
-            <h3>📝 Code Editor</h3>
+            <h3> Code Editor</h3>
           </div>
           <MonacoEditor
             height="100%"
@@ -260,7 +260,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
 
         <div className="output-pane">
           <div className="pane-header">
-            <h3>📤 Output</h3>
+            <h3> Output</h3>
           </div>
           <pre className="output-content">{output || 'Click "Run Code" to see output here...'}</pre>
         </div>
