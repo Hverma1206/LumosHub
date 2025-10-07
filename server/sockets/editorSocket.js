@@ -129,47 +129,4 @@ export default (socket, io) => {
     }
   });
 };
-   * Handle code changes (legacy support)
-   */
-  socket.on("code-change", ({ roomId, code }) => {
-    if (!roomExists(roomId)) return;
-    
-    // Update stored code
-    updateRoomCode(roomId, code);
-    
-    // Broadcast to all other users
-    socket.to(roomId).emit("code-update", code);
-  });
-  
-  /**
-   * Send current code to a specific user
-   */
-  socket.on("send-current-code", ({ targetSocketId, code }) => {
-    io.to(targetSocketId).emit("code-update", code);
-  });
 
-  /**
-   * Handle disconnect
-   */
-  socket.on("disconnect", () => {
-    console.log(" Client disconnected:", socket.id);
-    
-    // Clean up like leave-room
-    if (socket.roomId) {
-      const roomId = socket.roomId;
-      const userName = socket.userName;
-      
-      const result = removeUserFromRoom(roomId, socket.id);
-      
-      if (result) {
-        if (result.deleted) {
-          console.log(`Room ${roomId} deleted after disconnect`);
-        } else {
-          // Broadcast updated user list
-          io.to(roomId).emit("users-update", result.users);
-          socket.to(roomId).emit("user-left", { id: socket.id, name: userName });
-        }
-      }
-    }
-  });
-};
