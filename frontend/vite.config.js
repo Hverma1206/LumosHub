@@ -8,4 +8,7 @@ export default defineConfig({
     'process.env': process.env
   },
   plugins: [react()],
+  server: {
+    allowedHosts: ['c7f5a932ca76.ngrok-free.app']
+  }
 })
