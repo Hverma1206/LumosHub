@@ -84,7 +84,7 @@ const RoomJoin = ({ onJoinRoom }) => {
               className="create-button"
               disabled={!userName.trim()}
             >
-              🚀 Create a New Room
+              Create a New Room
             </button>
             
             <button
@@ -92,7 +92,7 @@ const RoomJoin = ({ onJoinRoom }) => {
               className="join-button"
               disabled={!userName.trim() || !roomId.trim()}
             >
-              🚪 Join Room
+              Join Room
             </button>
           </div>
         </div>
