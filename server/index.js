@@ -23,7 +23,7 @@ mongoose
 // Middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -38,14 +38,11 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
 app.use("/api/code", codeRoutes);
 app.use("/api/auth", authRoutes);
 
-// Create HTTP server
 const server = http.createServer(app);
 
-// Setup Socket.IO
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -53,7 +50,6 @@ const io = new Server(server, {
   },
 });
 
-// Attach socket logic
 io.on("connection", (socket) => {
   editorSocket(socket, io);
 });
