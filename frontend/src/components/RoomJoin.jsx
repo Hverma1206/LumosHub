@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import io from 'socket.io-client'
 import './RoomJoin.css'
 
-const RoomJoin = ({ onJoinRoom }) => {
+const RoomJoin = () => {
   const [roomId, setRoomId] = useState('')
   const [userName, setUserName] = useState('')
   const [socket, setSocket] = useState(null)
+  const { handleJoinRoom } = useOutletContext()
 
   useEffect(() => {
     const newSocket = io(import.meta.env.VITE_BACKEND_URL)
@@ -13,13 +15,13 @@ const RoomJoin = ({ onJoinRoom }) => {
 
     // Listen for room creation
     newSocket.on('room-created', ({ roomId, userName }) => {
-      onJoinRoom(roomId, userName)
+      handleJoinRoom(roomId, userName)
     })
 
     return () => {
       newSocket.disconnect()
     }
-  }, [onJoinRoom])
+  }, [handleJoinRoom])
 
   const handleCreateRoom = () => {
     if (!userName.trim()) {
@@ -32,7 +34,7 @@ const RoomJoin = ({ onJoinRoom }) => {
     }
   }
 
-  const handleJoinRoom = () => {
+  const handleJoinExistingRoom = () => {
     if (!userName.trim()) {
       alert('Please enter your name')
       return
@@ -41,7 +43,7 @@ const RoomJoin = ({ onJoinRoom }) => {
       alert('Please enter a room ID')
       return
     }
-    onJoinRoom(roomId.trim(), userName.trim())
+    handleJoinRoom(roomId.trim(), userName.trim())
   }
 
   return (
@@ -88,7 +90,7 @@ const RoomJoin = ({ onJoinRoom }) => {
             </button>
             
             <button
-              onClick={handleJoinRoom}
+              onClick={handleJoinExistingRoom}
               className="join-button"
               disabled={!userName.trim() || !roomId.trim()}
             >

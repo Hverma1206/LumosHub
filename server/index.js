@@ -8,19 +8,33 @@ import passport from "./config/passport.js";
 import codeRoutes from "./routes/codeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import editorSocket from "./sockets/editorSocket.js";
+import User from "./models/authModel.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8001;
 
-// Database connection
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
+  .then(async () => {
+    console.log("MongoDB connected");
+
+    // Clean up old indexes
+    try {
+      const collection = mongoose.connection.collection("users");
+      const indexes = await collection.getIndexes();
+
+      if (indexes.username_1) {
+        await collection.dropIndex("username_1");
+        console.log("Dropped old username index");
+      }
+    } catch (error) {
+      console.log("Index cleanup (non-critical):", error.message);
+    }
+  })
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Middleware
 app.use(
   cors({
     origin: process.env.CLIENT_URL,

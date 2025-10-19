@@ -51,10 +51,15 @@ export const login = async (req, res) => {
 
 export const googleAuthCallback = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.redirect(`${process.env.CLIENT_URL}/auth/failure?error=no_user`);
+    }
+    
     const token = generateToken(req.user._id);
     res.redirect(`${process.env.CLIENT_URL}/auth/success?token=${token}`);
   } catch (error) {
-    res.redirect(`${process.env.CLIENT_URL}/auth/failure`);
+    console.error('OAuth callback error:', error);
+    res.redirect(`${process.env.CLIENT_URL}/auth/failure?error=${encodeURIComponent(error.message)}`);
   }
 };
 

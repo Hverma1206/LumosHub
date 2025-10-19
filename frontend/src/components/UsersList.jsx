@@ -5,7 +5,7 @@ const UsersList = ({ users }) => {
   return (
     <div className="users-list">
       <div className="users-list-header">
-        <h3>👥 Users in Room ({users.length})</h3>
+        <h3> Users in Room ({users.length})</h3>
       </div>
       <div className="users-list-content">
         {users.length <= 1 && users.some(u => u.isYou) ? (

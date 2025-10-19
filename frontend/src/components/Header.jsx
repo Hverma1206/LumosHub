@@ -57,7 +57,7 @@ const Header = ({
           {isConnected ? ' Connected' : ' Disconnected'}
         </div>
         <div className="user-count">
-          👥 {connectedUsers} {connectedUsers === 1 ? 'user' : 'users'}
+          {connectedUsers} {connectedUsers === 1 ? 'user' : 'users'}
         </div>
       </div>
     </div>
