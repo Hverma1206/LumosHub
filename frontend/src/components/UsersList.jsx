@@ -5,11 +5,11 @@ const UsersList = ({ users }) => {
   return (
     <div className="users-list">
       <div className="users-list-header">
-        <h3>👥 Users in Room ({users.length})</h3>
+        <h3> Users in Room ({users.length})</h3>
       </div>
       <div className="users-list-content">
-        {users.length === 0 ? (
-          <p className="no-users">No other users in the room</p>
+        {users.length <= 1 && users.some(u => u.isYou) ? (
+          <p className="no-users">You are the only one here</p>
         ) : (
           <ul>
             {users.map((user, index) => (

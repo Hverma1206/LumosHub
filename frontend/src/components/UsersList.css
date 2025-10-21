@@ -2,27 +2,29 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-left: 1px solid #3e3e42;
-  background: #1e1e1e;
-  width: 250px;
+  border-left: 1px solid #30363d;
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+  width: 260px;
 }
 
 .users-list-header {
-  padding: 0.75rem 1rem;
-  background: #2d2d30;
-  border-bottom: 1px solid #3e3e42;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #161b22 0%, #1f2937 100%);
+  border-bottom: 1px solid #30363d;
 }
 
 .users-list-header h3 {
   margin: 0;
   font-size: 1rem;
-  color: #ffffff;
+  color: #e6edf3;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .users-list-content {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 0.75rem;
 }
 
 .users-list-content ul {
@@ -34,39 +36,69 @@
 .user-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 0.5rem;
+  padding: 0.9rem 1rem;
   margin-bottom: 0.5rem;
-  border-radius: 4px;
-  background: #252526;
+  border-radius: 8px;
+  background: #161b22;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.user-item:hover {
+  background: #1f2937;
+  border-color: #30363d;
 }
 
 .user-status-indicator {
   width: 10px;
   height: 10px;
-  background: #4CAF50;
+  background: #3fb980;
   border-radius: 50%;
-  margin-right: 0.75rem;
+  margin-right: 1rem;
+  box-shadow: 0 0 6px rgba(63, 185, 128, 0.6);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(63, 185, 128, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(63, 185, 128, 0.8);
+  }
 }
 
 .user-name {
-  color: #e1e1e1;
-  font-size: 0.9rem;
+  color: #e6edf3;
+  font-size: 0.95rem;
   flex: 1;
+  font-weight: 500;
 }
 
 .user-tag {
-  background: #007acc;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
+  background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%);
+  color: #010409;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .no-users {
-  color: #888;
+  color: #6e7681;
   text-align: center;
-  padding: 1rem 0;
+  padding: 2rem 1rem;
   font-style: italic;
   font-size: 0.9rem;
+}
+
+@media (max-width: 992px) {
+  .users-list {
+    width: 100%;
+    height: auto;
+    border-left: none;
+    border-top: 1px solid #30363d;
+    max-height: 300px;
+  }
 }

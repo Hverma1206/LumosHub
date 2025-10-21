@@ -1,8 +1,4 @@
+node_modules/
 .env
-
-/node_modules
-package-lock.json
-npm-debug.log
-yarn-error.log
-yarn-debug.log
-yarn.lock   
+.env.local
+.env.production

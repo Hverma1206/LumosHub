@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
+import { useParams, useOutletContext } from 'react-router-dom';
 import MonacoEditor from '@monaco-editor/react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import './CodeEditor.css';
 import UsersList from './UsersList';
+import Header from './Header';
+import OutputConsole from './OutputConsole';
 
 const SUPPORTED_LANGUAGES = [
   { id: 'javascript', name: 'JavaScript', extension: 'js' },
@@ -25,12 +28,15 @@ const DEFAULT_CODE = {
   rust: 'fn main() {\n    println!("Hello, World!");\n}'
 };
 
-const CodeEditor = ({ roomId: propRoomId, userName }) => {
+const CodeEditor = () => {
+  const { roomId: paramRoomId } = useParams()
+  const { userName } = useOutletContext()
+  
   const [code, setCode] = useState(DEFAULT_CODE.javascript);
   const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
-  const [roomId, setRoomId] = useState(propRoomId || 'default-room');
+  const [roomId, setRoomId] = useState(paramRoomId || 'default-room');
   const [isConnected, setIsConnected] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState(1);
   const [users, setUsers] = useState([]);
@@ -184,59 +190,23 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
 
   return (
     <div className="code-editor">
-      <div className="editor-header">
-        <div className="controls">
-          {!propRoomId && (
-            <div className="control-group">
-              <label>Room ID:</label>
-              <input
-                type="text"
-                value={roomId}
-                onChange={(e) => handleRoomChange(e.target.value)}
-                placeholder="Enter room ID"
-                className="room-input"
-              />
-            </div>
-          )}
-          
-          <div className="control-group">
-            <label>Language:</label>
-            <select
-              value={language}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-              className="language-select"
-            >
-              {SUPPORTED_LANGUAGES.map(lang => (
-                <option key={lang.id} value={lang.id}>
-                  {lang.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            onClick={handleRunCode}
-            disabled={isRunning}
-            className="run-button"
-          >
-            {isRunning ? '⏳ Running...' : '▶️ Run Code'}
-          </button>
-        </div>
-
-        <div className="status">
-          <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
-            {isConnected ? ' Connected' : ' Disconnected'}
-          </div>
-          <div className="user-count">
-            👥 {connectedUsers} {connectedUsers === 1 ? 'user' : 'users'}
-          </div>
-        </div>
-      </div>
+      <Header
+        propRoomId={paramRoomId}
+        roomId={roomId}
+        handleRoomChange={handleRoomChange}
+        language={language}
+        handleLanguageChange={handleLanguageChange}
+        SUPPORTED_LANGUAGES={SUPPORTED_LANGUAGES}
+        handleRunCode={handleRunCode}
+        isRunning={isRunning}
+        isConnected={isConnected}
+        connectedUsers={connectedUsers}
+      />
 
       <div className="editor-container">
         <div className="editor-pane">
           <div className="pane-header">
-            <h3> Code Editor</h3>
+            <h3> Code Editor </h3>
           </div>
           <MonacoEditor
             height="100%"
@@ -258,12 +228,7 @@ const CodeEditor = ({ roomId: propRoomId, userName }) => {
           />
         </div>
 
-        <div className="output-pane">
-          <div className="pane-header">
-            <h3> Output</h3>
-          </div>
-          <pre className="output-content">{output || 'Click "Run Code" to see output here...'}</pre>
-        </div>
+        <OutputConsole output={output} />
 
         <UsersList users={users} />
       </div>

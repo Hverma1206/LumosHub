@@ -8,4 +8,7 @@ export default defineConfig({
     'process.env': process.env
   },
   plugins: [react()],
+  server: {
+    allowedHosts: [process.env.VITE_ALLOWED_HOST]
+  }
 })
