@@ -9,6 +9,6 @@ export default defineConfig({
   },
   plugins: [react()],
   server: {
-    allowedHosts: ['c7f5a932ca76.ngrok-free.app']
+    allowedHosts: [process.env.VITE_ALLOWED_HOST]
   }
 })
