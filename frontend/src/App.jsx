@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Outlet } from 'react-router-dom'
-import { authService } from './utils/authService'
 import './App.css'
 
 function App() {
@@ -8,23 +7,37 @@ function App() {
   const [userName, setUserName] = useState('')
   const navigate = useNavigate()
 
+  // Restore room and user from localStorage on mount
+  useEffect(() => {
+    const savedRoom = localStorage.getItem('currentRoom')
+    const savedUser = localStorage.getItem('userName')
+    
+    if (savedRoom && savedUser) {
+      setCurrentRoom(savedRoom)
+      setUserName(savedUser)
+    }
+  }, [])
+
   const handleJoinRoom = (roomId, name) => {
     setCurrentRoom(roomId)
     setUserName(name)
+    
+    // Persist to localStorage
+    localStorage.setItem('currentRoom', roomId)
+    localStorage.setItem('userName', name)
+    
     navigate(`/editor/${roomId}`)
   }
 
   const handleLeaveRoom = () => {
     setCurrentRoom(null)
     setUserName('')
+    
+    // Clear from localStorage
+    localStorage.removeItem('currentRoom')
+    localStorage.removeItem('userName')
+    
     navigate('/room-join')
-  }
-
-  const handleLogout = () => {
-    authService.logout()
-    setCurrentRoom(null)
-    setUserName('')
-    navigate('/login')
   }
 
   return (
@@ -38,11 +51,6 @@ function App() {
               Leave Room
             </button>
           </div>
-        )}
-        {currentRoom && (
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
         )}
       </header>
       <main className="app-main">
