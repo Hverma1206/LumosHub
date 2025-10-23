@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import MonacoEditor from '@monaco-editor/react';
 import io from 'socket.io-client';
 import axios from 'axios';
@@ -31,6 +31,7 @@ const DEFAULT_CODE = {
 const CodeEditor = () => {
   const { roomId: paramRoomId } = useParams()
   const { userName } = useOutletContext()
+  const navigate = useNavigate()
   
   const [code, setCode] = useState(DEFAULT_CODE.javascript);
   const [language, setLanguage] = useState('javascript');
@@ -188,6 +189,20 @@ const CodeEditor = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem('currentRoom')
+    localStorage.removeItem('userName')
+    
+    // Disconnect socket
+    if (socketRef.current) {
+      socketRef.current.disconnect()
+    }
+    
+    // Navigate to login
+    navigate('/login')
+  }
+
   return (
     <div className="code-editor">
       <Header
@@ -201,6 +216,7 @@ const CodeEditor = () => {
         isRunning={isRunning}
         isConnected={isConnected}
         connectedUsers={connectedUsers}
+        onLogout={handleLogout}
       />
 
       <div className="editor-container">

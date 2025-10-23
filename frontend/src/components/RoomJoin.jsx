@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useOutletContext, useNavigate } from 'react-router-dom'
 import io from 'socket.io-client'
 import './RoomJoin.css'
 
@@ -8,6 +8,7 @@ const RoomJoin = () => {
   const [userName, setUserName] = useState('')
   const [socket, setSocket] = useState(null)
   const { handleJoinRoom } = useOutletContext()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const newSocket = io(import.meta.env.VITE_BACKEND_URL)
@@ -46,8 +47,26 @@ const RoomJoin = () => {
     handleJoinRoom(roomId.trim(), userName.trim())
   }
 
+  const handleLogout = () => {
+    setUserName('')
+    setRoomId('')
+    if (socket) {
+      socket.disconnect()
+    }
+    navigate('/')
+  }
+
   return (
     <div className="room-join">
+      {userName && (
+        <div className="user-info">
+          <span>Logged in as: <strong>{userName}</strong></span>
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
+        </div>
+      )}
+
       <div className="room-join-container">
         <div className="welcome-section">
           <h2>Welcome to LumosHub!</h2>

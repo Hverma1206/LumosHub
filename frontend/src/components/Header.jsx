@@ -11,6 +11,7 @@ const Header = ({
   isRunning,
   isConnected,
   connectedUsers,
+  onLogout,
 }) => {
   return (
     <div className="editor-header">
@@ -59,6 +60,9 @@ const Header = ({
         <div className="user-count">
           {connectedUsers} {connectedUsers === 1 ? 'user' : 'users'}
         </div>
+        <button onClick={onLogout} className="logout-button">
+          Logout
+        </button>
       </div>
     </div>
   );

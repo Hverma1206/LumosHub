@@ -179,6 +179,28 @@
   word-break: break-word;
 }
 
+.logout-button {
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(135deg, #f85149 0%, #fa7a5c 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(248, 81, 73, 0.25);
+}
+
+.logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(248, 81, 73, 0.35);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+}
+
 @media (max-width: 1200px) {
   .output-pane {
     width: 260px;
