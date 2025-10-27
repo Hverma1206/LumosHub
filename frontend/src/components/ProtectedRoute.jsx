@@ -1,15 +1,16 @@
 import { Navigate } from 'react-router-dom';
-import { authService } from '../utils/authService';
 
 const ProtectedRoute = ({ children }) => {
-  const token = authService.getToken();
-  const isAuthenticated = token && token !== 'anonymous';
+  const token = localStorage.getItem('token');
+  const userName = localStorage.getItem('userName');
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  // Allow access if both token and userName exist
+  if (token && userName) {
+    return children;
   }
 
-  return children;
+  // Redirect to login if not authenticated
+  return <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;

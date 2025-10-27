@@ -47,6 +47,63 @@
   font-weight: 500;
 }
 
+.room-id-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.room-id-display label {
+  font-size: 0.85rem;
+  color: #8b949e;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.room-id-value {
+  padding: 0.5rem 1rem;
+  background: rgba(88, 166, 255, 0.1);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  border-radius: 6px;
+  color: #58a6ff;
+  font-family: 'Fira Code', monospace;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.room-id-display:hover .room-id-value {
+  background: rgba(88, 166, 255, 0.2);
+  border-color: rgba(88, 166, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+}
+
+.copy-icon {
+  margin-left: 0.5rem;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #58a6ff;
+}
+
+.room-id-display:active .copy-icon {
+  transform: scale(1.2);
+}
+
+.copy-icon.copied {
+  color: #3fb980;
+}
+
 .room-input:hover,
 .language-select:hover {
   border-color: #58a6ff;
@@ -199,6 +256,29 @@
 
 .logout-button:active {
   transform: translateY(0);
+}
+
+.leave-room-button {
+  padding: 0.65rem 1.25rem;
+  background: #30363d;
+  color: #e6edf3;
+  border: 1px solid #424d57;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: none;
+}
+
+.leave-room-button:hover {
+  background: #424d57;
+  border-color: #58a6ff;
+  transform: none;
+}
+
+.leave-room-button:active {
+  background: #30363d;
 }
 
 @media (max-width: 1200px) {
