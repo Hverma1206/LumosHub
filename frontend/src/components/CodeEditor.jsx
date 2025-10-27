@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import MonacoEditor from '@monaco-editor/react';
 import io from 'socket.io-client';
 import axios from 'axios';
@@ -30,8 +30,10 @@ const DEFAULT_CODE = {
 
 const CodeEditor = () => {
   const { roomId: paramRoomId } = useParams()
-  const { userName } = useOutletContext()
   const navigate = useNavigate()
+  
+  // Get userName from localStorage instead of useOutletContext
+  const userName = localStorage.getItem('userName') || 'Anonymous'
   
   const [code, setCode] = useState(DEFAULT_CODE.javascript);
   const [language, setLanguage] = useState('javascript');

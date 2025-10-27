@@ -18,6 +18,13 @@ body {
   background: inherit;
 }
 
+.app-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .app-header {
   background: linear-gradient(135deg, #1f1f23 0%, #2d2d30 100%);
   padding: 1.5rem 2rem;

@@ -25,7 +25,11 @@ const routes = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: '/room-join',
+        path: '',
+        element: <Navigate to="/room-join" replace />,
+      },
+      {
+        path: 'room-join',
         element: (
           <ProtectedRoute>
             <RoomJoin />
@@ -33,16 +37,12 @@ const routes = createBrowserRouter([
         ),
       },
       {
-        path: '/editor/:roomId',
+        path: 'editor/:roomId',
         element: (
           <ProtectedRoute>
             <CodeEditor />
           </ProtectedRoute>
         ),
-      },
-      {
-        path: '/',
-        element: <Navigate to="/room-join" replace />,
       },
     ],
   },

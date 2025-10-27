@@ -1,5 +1,5 @@
 .room-join {
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11,7 +11,7 @@
 .user-info {
   position: absolute;
   top: 1.5rem;
-  right: 1.5rem;
+  left: 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;

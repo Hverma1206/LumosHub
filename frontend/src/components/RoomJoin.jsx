@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useOutletContext, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import io from 'socket.io-client'
 import './RoomJoin.css'
 
@@ -7,26 +7,33 @@ const RoomJoin = () => {
   const [roomId, setRoomId] = useState('')
   const [userName, setUserName] = useState('')
   const [socket, setSocket] = useState(null)
-  const { handleJoinRoom } = useOutletContext()
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Get userName from localStorage (set by OAuth callback)
+    const storedUserName = localStorage.getItem('userName')
+    if (storedUserName) {
+      setUserName(storedUserName)
+    }
+
     const newSocket = io(import.meta.env.VITE_BACKEND_URL)
     setSocket(newSocket)
 
     // Listen for room creation
     newSocket.on('room-created', ({ roomId, userName }) => {
-      handleJoinRoom(roomId, userName)
+      const trimmedRoomId = roomId.substring(0, 9)
+      localStorage.setItem('currentRoom', trimmedRoomId)
+      navigate(`/editor/${trimmedRoomId}`)
     })
 
     return () => {
       newSocket.disconnect()
     }
-  }, [handleJoinRoom])
+  }, [navigate])
 
   const handleCreateRoom = () => {
     if (!userName.trim()) {
-      alert('Please enter your name')
+      alert('Please log in via Google first')
       return
     }
     
@@ -37,23 +44,27 @@ const RoomJoin = () => {
 
   const handleJoinExistingRoom = () => {
     if (!userName.trim()) {
-      alert('Please enter your name')
+      alert('Please log in via Google first')
       return
     }
     if (!roomId.trim()) {
       alert('Please enter a room ID')
       return
     }
-    handleJoinRoom(roomId.trim(), userName.trim())
+    localStorage.setItem('currentRoom', roomId.trim())
+    navigate(`/editor/${roomId.trim()}`)
   }
 
   const handleLogout = () => {
+    localStorage.removeItem('userName')
+    localStorage.removeItem('token')
+    localStorage.removeItem('currentRoom')
     setUserName('')
     setRoomId('')
     if (socket) {
       socket.disconnect()
     }
-    navigate('/')
+    navigate('/login')
   }
 
   return (
@@ -61,10 +72,13 @@ const RoomJoin = () => {
       {userName && (
         <div className="user-info">
           <span>Logged in as: <strong>{userName}</strong></span>
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
         </div>
+      )}
+
+      {userName && (
+        <button onClick={handleLogout} className="logout-button">
+          Logout
+        </button>
       )}
 
       <div className="room-join-container">
@@ -74,18 +88,11 @@ const RoomJoin = () => {
         </div>
 
         <div className="form-section">
-          <div className="input-group">
-            <label htmlFor="userName">Your Name</label>
-            <input
-              id="userName"
-              type="text"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              placeholder="Enter your name"
-              className="name-input"
-              maxLength={20}
-            />
-          </div>
+          {!userName && (
+            <div className="input-group">
+              <p style={{ color: '#8b949e', textAlign: 'center' }}>Please sign in with Google to continue</p>
+            </div>
+          )}
           
           <div className="input-group">
             <label htmlFor="roomId">Room ID</label>
@@ -96,6 +103,7 @@ const RoomJoin = () => {
               onChange={(e) => setRoomId(e.target.value)}
               placeholder="Enter Room ID or create new"
               className="room-input"
+              disabled={!userName}
             />
           </div>
           

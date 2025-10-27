@@ -56,7 +56,8 @@ export const googleAuthCallback = async (req, res) => {
     }
     
     const token = generateToken(req.user._id);
-    res.redirect(`${process.env.CLIENT_URL}/auth/success?token=${token}`);
+    // Include user name in the redirect URL
+    res.redirect(`${process.env.CLIENT_URL}/auth/success?token=${token}&name=${encodeURIComponent(req.user.name)}`);
   } catch (error) {
     console.error('OAuth callback error:', error);
     res.redirect(`${process.env.CLIENT_URL}/auth/failure?error=${encodeURIComponent(error.message)}`);
