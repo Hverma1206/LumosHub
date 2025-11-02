@@ -32,7 +32,6 @@ const CodeEditor = () => {
   const { roomId: paramRoomId } = useParams()
   const navigate = useNavigate()
   
-  // Get userName from localStorage instead of useOutletContext
   const userName = localStorage.getItem('userName') || 'Anonymous'
   
   const [code, setCode] = useState(DEFAULT_CODE.javascript);
@@ -47,15 +46,14 @@ const CodeEditor = () => {
   const socketRef = useRef(null);
   const editorRef = useRef(null);
   const isRemoteChange = useRef(false);
+  const isRemoteLanguageChange = useRef(false);
 
   useEffect(() => {
-    // Initialize Socket.IO connection
-  socketRef.current = io(import.meta.env.VITE_BACKEND_URL);
+    socketRef.current = io(import.meta.env.VITE_BACKEND_URL);
 
     socketRef.current.on('connect', () => {
       setIsConnected(true);
       
-      // Join the room
       socketRef.current.emit('join-room', {
         roomId,
         userName: userName || 'Anonymous'
@@ -66,19 +64,16 @@ const CodeEditor = () => {
       setIsConnected(false);
     });
 
-    // Handle room not found
     socketRef.current.on('room-not-found', ({ roomId }) => {
       alert(`Room ${roomId} does not exist!`);
       setIsConnected(false);
     });
 
-    // Handle code updates from other users
     socketRef.current.on('code-update', (newCode) => {
       isRemoteChange.current = true;
       setCode(newCode);
     });
 
-    // Handle remote edits
     socketRef.current.on('remote-edit', (newCode) => {
       isRemoteChange.current = true;
       setCode(newCode);
@@ -91,17 +86,14 @@ const CodeEditor = () => {
       });
     });
 
-    // Handle user joined
     socketRef.current.on('user-joined', ({ name }) => {
       console.log(`${name} joined the room`);
     });
 
-    // Handle user left
     socketRef.current.on('user-left', ({ name }) => {
       console.log(`${name} left the room`);
     });
 
-    // Handle users update
     socketRef.current.on('users-update', (roomUsers) => {
       const updatedUsers = roomUsers.map(user => ({
         ...user,
@@ -109,6 +101,33 @@ const CodeEditor = () => {
       }));
       setUsers(updatedUsers);
       setConnectedUsers(roomUsers.length);
+    });
+
+    // Listen for code execution results
+    socketRef.current.on('code-executed', ({ executedBy, language: execLanguage, output: execOutput, stderr }) => {
+      let outputText = '';
+      
+      if (execOutput) {
+        outputText += `Output:\n${execOutput}`;
+      }
+      
+      if (stderr) {
+        outputText += `${outputText ? '\n\n' : ''}Errors:\n${stderr}`;
+      }
+      
+      if (!execOutput && !stderr) {
+        outputText = 'Code executed successfully (no output)';
+      }
+      
+      setOutput(outputText);
+    });
+
+    // Listen for language changes from other users
+    socketRef.current.on('language-updated', ({ language: newLanguage }) => {
+      isRemoteLanguageChange.current = true;
+      setLanguage(newLanguage);
+      setCode(DEFAULT_CODE[newLanguage] || '');
+      setOutput('');
     });
 
     return () => {
@@ -127,7 +146,6 @@ const CodeEditor = () => {
 
     setCode(value || '');
     
-    // Emit code changes using local-edit
     if (socketRef.current && isConnected) {
       socketRef.current.emit('local-edit', {
         roomId,
@@ -137,9 +155,22 @@ const CodeEditor = () => {
   };
 
   const handleLanguageChange = (newLanguage) => {
+    if (isRemoteLanguageChange.current) {
+      isRemoteLanguageChange.current = false;
+      return;
+    }
+
     setLanguage(newLanguage);
     setCode(DEFAULT_CODE[newLanguage] || '');
     setOutput('');
+
+    // Emit language change to all users in the room
+    if (socketRef.current && isConnected) {
+      socketRef.current.emit('language-change', {
+        roomId,
+        language: newLanguage
+      });
+    }
   };
 
   const handleRunCode = async () => {
@@ -174,9 +205,34 @@ const CodeEditor = () => {
       }
 
       setOutput(outputText);
+
+      // Emit execution result to all users in the room
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('execute-code', {
+          roomId,
+          language,
+          version: '*',
+          code,
+          output: result.stdout || '',
+          stderr: result.stderr || ''
+        });
+      }
     } catch (error) {
       console.error('Execution error:', error);
-      setOutput(`Error: ${error.response?.data?.error || error.message}`);
+      const errorMsg = error.response?.data?.error || error.message;
+      setOutput(`Error: ${errorMsg}`);
+
+      // Emit error to all users in the room
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit('execute-code', {
+          roomId,
+          language,
+          version: '*',
+          code,
+          output: '',
+          stderr: errorMsg
+        });
+      }
     } finally {
       setIsRunning(false);
     }
@@ -192,16 +248,13 @@ const CodeEditor = () => {
   };
 
   const handleLogout = () => {
-    // Clear localStorage
     localStorage.removeItem('currentRoom')
     localStorage.removeItem('userName')
     
-    // Disconnect socket
     if (socketRef.current) {
       socketRef.current.disconnect()
     }
     
-    // Navigate to login
     navigate('/login')
   }
 
